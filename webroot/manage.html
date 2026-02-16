@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebServer Guard - Management Panel</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+        
+        .card h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+        
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            margin: 8px 0;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .status-running {
+            border-left-color: #28a745;
+        }
+        
+        .status-stopped {
+            border-left-color: #dc3545;
+        }
+        
+        .badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: bold;
+        }
+        
+        .badge-success {
+            background: #28a745;
+            color: white;
+        }
+        
+        .badge-danger {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .badge-info {
+            background: #17a2b8;
+            color: white;
+        }
+        
+        .input-group {
+            margin: 15px 0;
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+        }
+        
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+        
+        .input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin: 5px;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #c82333;
+        }
+        
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #218838;
+        }
+        
+        .log-viewer {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            max-height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        
+        .process-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .process-item {
+            padding: 10px;
+            margin: 5px 0;
+            background: #f8f9fa;
+            border-radius: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .process-item .name {
+            font-weight: 500;
+            color: #333;
+        }
+        
+        .process-item .status {
+            font-size: 0.85em;
+            color: #666;
+        }
+        
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            display: none;
+        }
+        
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 1.8em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🛡️ WebServer Guard</h1>
+            <p>Management Panel</p>
+        </div>
+        
+        <div class="grid">
+            <!-- Status Card -->
+            <div class="card">
+                <h2>📊 System Status</h2>
+                <div id="statusContainer">
+                    <div class="status-item">
+                        <span>Loading status...</span>
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="refreshStatus()">🔄 Refresh Status</button>
+            </div>
+            
+            <!-- Protected Processes -->
+            <div class="card">
+                <h2>🛡️ Protected Processes</h2>
+                <div id="protectedList" class="process-list">
+                    <div class="process-item">
+                        <span>Loading...</span>
+                    </div>
+                </div>
+                <button class="btn btn-success" onclick="refreshProtected()">🔄 Refresh List</button>
+            </div>
+        </div>
+        
+        <!-- Add Protection -->
+        <div class="card">
+            <h2>➕ Add Process Protection</h2>
+            <div class="input-group">
+                <label for="processName">Process Name or Package:</label>
+                <input type="text" id="processName" placeholder="e.g., com.termux, httpd, nginx, python">
+            </div>
+            <button class="btn btn-primary" onclick="addProtection()">Add Protection</button>
+            <div id="addAlert" class="alert"></div>
+        </div>
+        
+        <!-- Remove Protection -->
+        <div class="card">
+            <h2>➖ Remove Process Protection</h2>
+            <div class="input-group">
+                <label for="removeProcessName">Process Name:</label>
+                <input type="text" id="removeProcessName" placeholder="Enter process name to remove">
+            </div>
+            <button class="btn btn-danger" onclick="removeProtection()">Remove Protection</button>
+            <div id="removeAlert" class="alert"></div>
+        </div>
+        
+        <!-- Log Viewer -->
+        <div class="card">
+            <h2>📝 Module Logs</h2>
+            <div id="logViewer" class="log-viewer">
+                Loading logs...
+            </div>
+            <button class="btn btn-primary" onclick="refreshLogs()">🔄 Refresh Logs</button>
+            <button class="btn btn-success" onclick="downloadLogs()">💾 Download Logs</button>
+        </div>
+    </div>
+    
+    <script>
+        // API endpoints (using CGI scripts)
+        const API = {
+            status: '/cgi-bin/api.sh?action=status',
+            protected: '/cgi-bin/api.sh?action=list',
+            add: '/cgi-bin/api.sh?action=add',
+            remove: '/cgi-bin/api.sh?action=remove',
+            logs: '/cgi-bin/api.sh?action=logs'
+        };
+        
+        // Show alert message
+        function showAlert(elementId, message, type) {
+            const alert = document.getElementById(elementId);
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
+            alert.style.display = 'block';
+            setTimeout(() => {
+                alert.style.display = 'none';
+            }, 5000);
+        }
+        
+        // Refresh system status
+        async function refreshStatus() {
+            try {
+                const response = await fetch(API.status);
+                const data = await response.json();
+                
+                const container = document.getElementById('statusContainer');
+                container.innerHTML = '';
+                
+                // Protection Daemon
+                container.innerHTML += `
+                    <div class="status-item ${data.daemon ? 'status-running' : 'status-stopped'}">
+                        <span>Protection Daemon</span>
+                        <span class="badge ${data.daemon ? 'badge-success' : 'badge-danger'}">
+                            ${data.daemon ? '✓ Running' : '✗ Stopped'}
+                        </span>
+                    </div>
+                `;
+                
+                // Watchdog
+                container.innerHTML += `
+                    <div class="status-item ${data.watchdog ? 'status-running' : 'status-stopped'}">
+                        <span>Web Server Watchdog</span>
+                        <span class="badge ${data.watchdog ? 'badge-success' : 'badge-danger'}">
+                            ${data.watchdog ? '✓ Running' : '✗ Stopped'}
+                        </span>
+                    </div>
+                `;
+                
+                // Web Server
+                container.innerHTML += `
+                    <div class="status-item ${data.httpd ? 'status-running' : 'status-stopped'}">
+                        <span>Web Server ${data.httpd_pid ? `(PID: ${data.httpd_pid})` : ''}</span>
+                        <span class="badge ${data.httpd ? 'badge-success' : 'badge-danger'}">
+                            ${data.httpd ? '✓ Running' : '✗ Stopped'}
+                        </span>
+                    </div>
+                `;
+                
+                // Termux
+                if (data.termux) {
+                    container.innerHTML += `
+                        <div class="status-item status-running">
+                            <span>Termux (PID: ${data.termux_pid})</span>
+                            <span class="badge badge-success">✓ Running</span>
+                        </div>
+                    `;
+                }
+                
+                // Protected count
+                container.innerHTML += `
+                    <div class="status-item">
+                        <span>Protected Processes</span>
+                        <span class="badge badge-info">${data.protected_count || 0}</span>
+                    </div>
+                `;
+                
+            } catch (error) {
+                console.error('Error fetching status:', error);
+                document.getElementById('statusContainer').innerHTML = 
+                    '<div class="status-item status-stopped"><span>Error loading status</span></div>';
+            }
+        }
+        
+        // Refresh protected processes list
+        async function refreshProtected() {
+            try {
+                const response = await fetch(API.protected);
+                const data = await response.json();
+                
+                const container = document.getElementById('protectedList');
+                container.innerHTML = '';
+                
+                if (data.processes && data.processes.length > 0) {
+                    data.processes.forEach(proc => {
+                        container.innerHTML += `
+                            <div class="process-item">
+                                <div>
+                                    <div class="name">${proc.name}</div>
+                                    <div class="status">${proc.running ? '✓ Running' : '✗ Not running'}</div>
+                                </div>
+                                <span class="badge ${proc.running ? 'badge-success' : 'badge-danger'}">
+                                    ${proc.running ? 'Active' : 'Inactive'}
+                                </span>
+                            </div>
+                        `;
+                    });
+                } else {
+                    container.innerHTML = '<div class="process-item"><span>No protected processes</span></div>';
+                }
+                
+            } catch (error) {
+                console.error('Error fetching protected list:', error);
+                document.getElementById('protectedList').innerHTML = 
+                    '<div class="process-item"><span>Error loading list</span></div>';
+            }
+        }
+        
+        // Add process protection
+        async function addProtection() {
+            const processName = document.getElementById('processName').value.trim();
+            
+            if (!processName) {
+                showAlert('addAlert', 'Please enter a process name', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API.add}&process=${encodeURIComponent(processName)}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    showAlert('addAlert', `✓ Added ${processName} to protection list`, 'success');
+                    document.getElementById('processName').value = '';
+                    refreshProtected();
+                    refreshStatus();
+                } else {
+                    showAlert('addAlert', data.message || 'Failed to add protection', 'error');
+                }
+            } catch (error) {
+                console.error('Error adding protection:', error);
+                showAlert('addAlert', 'Error adding protection', 'error');
+            }
+        }
+        
+        // Remove process protection
+        async function removeProtection() {
+            const processName = document.getElementById('removeProcessName').value.trim();
+            
+            if (!processName) {
+                showAlert('removeAlert', 'Please enter a process name', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API.remove}&process=${encodeURIComponent(processName)}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    showAlert('removeAlert', `✓ Removed ${processName} from protection list`, 'success');
+                    document.getElementById('removeProcessName').value = '';
+                    refreshProtected();
+                    refreshStatus();
+                } else {
+                    showAlert('removeAlert', data.message || 'Failed to remove protection', 'error');
+                }
+            } catch (error) {
+                console.error('Error removing protection:', error);
+                showAlert('removeAlert', 'Error removing protection', 'error');
+            }
+        }
+        
+        // Refresh logs
+        async function refreshLogs() {
+            try {
+                const response = await fetch(API.logs);
+                const data = await response.json();
+                
+                const logViewer = document.getElementById('logViewer');
+                logViewer.textContent = data.logs || 'No logs available';
+                logViewer.scrollTop = logViewer.scrollHeight;
+                
+            } catch (error) {
+                console.error('Error fetching logs:', error);
+                document.getElementById('logViewer').textContent = 'Error loading logs';
+            }
+        }
+        
+        // Download logs
+        async function downloadLogs() {
+            try {
+                const response = await fetch(API.logs);
+                const data = await response.json();
+                
+                const blob = new Blob([data.logs], { type: 'text/plain' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `webserver_guard_${new Date().toISOString().split('T')[0]}.log`;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+                
+            } catch (error) {
+                console.error('Error downloading logs:', error);
+                alert('Error downloading logs');
+            }
+        }
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            refreshStatus();
+            refreshProtected();
+            refreshLogs();
+            
+            // Auto-refresh every 30 seconds
+            setInterval(() => {
+                refreshStatus();
+                refreshProtected();
+            }, 30000);
+        });
+        
+        // Enter key support for inputs
+        document.getElementById('processName').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') addProtection();
+        });
+        
+        document.getElementById('removeProcessName').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') removeProtection();
+        });
+    </script>
+</body>
+</html>
