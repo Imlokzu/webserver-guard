@@ -1,5 +1,4 @@
 # Build artifacts
-*.zip
 temp_check/
 
 # IDE
