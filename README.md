@@ -3,7 +3,7 @@
 [![Magisk](https://img.shields.io/badge/Magisk-20.4%2B-00B39B?style=flat-square&logo=magisk)](https://github.com/topjohnwu/Magisk)
 [![Android](https://img.shields.io/badge/Android-5.0%2B-3DDC84?style=flat-square&logo=android)](https://www.android.com/)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](LICENSE)
-[![Version](https://img.shields.io/badge/Version-1.0.0-brightgreen?style=flat-square)](https://github.com/yourusername/webserver-guard/releases)
+[![Version](https://img.shields.io/badge/Version-1.0.0-brightgreen?style=flat-square)](https://github.com/imlokzu/webserver-guard/releases)
 
 Transform your rooted Android device into a **persistent web server host** with advanced process protection. Prevents Android from killing Termux and other critical processes, while hosting a web server on port 80.
 
@@ -38,7 +38,7 @@ Transform your rooted Android device into a **persistent web server host** with 
 
 ### Method 1: Via Magisk Manager (Recommended)
 
-1. Download `WebServerGuard_v1.0.0.zip` from [Releases](https://github.com/yourusername/webserver-guard/releases)
+1. Download `WebServerGuard_v1.0.0.zip` from [Releases](https://github.com/imlokzu/webserver-guard/releases)
 2. Open Magisk Manager
 3. Go to **Modules** → **Install from storage**
 4. Select the ZIP file
@@ -222,8 +222,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📞 Support
 
-- **Issues**: [GitHub Issues](https://github.com/yourusername/webserver-guard/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/yourusername/webserver-guard/discussions)
+- **Issues**: [GitHub Issues](https://github.com/imlokzu/webserver-guard/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/imlokzu/webserver-guard/discussions)
 - **XDA Thread**: [Link to XDA thread]
 
 ## ⚠️ Disclaimer
