@@ -6,3 +6,4 @@ author=AndroidRootDev
 description=Persistent web server on port 80 with advanced process protection. Prevents Android from killing Termux and user-selected processes. Includes watchdog, OOM protection, and battery optimization bypass.
 updateJson=https://raw.githubusercontent.com/Imlokzu/webserver-guard/main/update.json
 webRoot=webroot
+action=am start -a android.intent.action.VIEW -d http://localhost:8080/manage.html

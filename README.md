@@ -9,13 +9,14 @@ Transform your rooted Android device into a **persistent web server host** with 
 
 ## ✨ Features
 
-### 🌐 Web Management Interface (NEW!)
-- Modern web-based control panel
-- Real-time status monitoring
-- Add/remove protected processes via UI
-- Live log viewer with download
-- Works with Magisk v28.1+ WebUI or any browser
-- Auto-refresh dashboard
+### 🌐 Modern Web Management Interface
+- **Industrial Terminal Design** - Professional dark theme with neon green accents
+- **Real-time Dashboard** - Live system status monitoring
+- **Process Management** - Add/remove protected processes via web UI
+- **Live Log Viewer** - View and download module logs
+- **All Processes View** - Browse and protect any running process
+- **Auto-refresh** - Dashboard updates every 30 seconds
+- **Mobile Responsive** - Works on phones and tablets
 
 ### 🌐 Web Server
 - Persistent web server on port 80 (with automatic 8080 fallback)
@@ -100,23 +101,26 @@ reboot
 
 After installation and reboot:
 
-### Option 1: Web Management Interface (Recommended)
+### Web Management Interface (Recommended)
+
+**Access via browser:**
+```
+http://localhost:8080/manage.html
+```
+
+**Features:**
+- 📊 Real-time status dashboard with industrial terminal design
+- 🛡️ Add/remove protected processes
+- 📋 View all running processes
+- 📝 Live log viewer with download
+- 🔄 Auto-refresh every 30 seconds
 
 **For Magisk v28.1+:**
 1. Open Magisk Manager → Modules
 2. Tap on **WebServer Guard**
-3. Click **Open WebUI**
-4. Manage everything through the web interface
+3. Click **Open WebUI** button
 
-**For all versions:**
-- Access via browser: `http://localhost/manage.html`
-- Features:
-  - 📊 Real-time status dashboard
-  - 🛡️ Add/remove protected processes
-  - 📝 Live log viewer
-  - 🔄 Auto-refresh every 30 seconds
-
-### Option 2: Command Line Interface
+### Command Line Interface
 
 #### Access Web Server
 
@@ -254,14 +258,15 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ### v1.0.0 (2024)
 - Initial release
-- Web server on port 80
-- Process protection engine
-- Termux protection
-- OOM score management
-- Battery optimization bypass
-- LMK tuning
-- ZRAM support
+- Modern web management interface with industrial terminal design
+- Web server on port 80 with auto-restart watchdog
+- Process protection engine with OOM score -1000
+- Automatic Termux protection
+- Battery optimization bypass and Doze whitelist
+- LMK tuning and ZRAM support (512MB)
 - CLI management tool
+- Real-time log viewer
+- All processes browser with one-click protection
 
 ## 📄 License
 

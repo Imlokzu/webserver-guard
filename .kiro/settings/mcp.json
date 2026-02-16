@@ -1,0 +1,20 @@
+{
+  "mcpServers": {
+    "figma": {
+      "command": "uvx",
+      "args": ["mcp-server-figma"],
+      "env": {
+        "FIGMA_PERSONAL_ACCESS_TOKEN": ""
+      },
+      "disabled": false,
+      "autoApprove": []
+    },
+    "stitch": {
+      "command": "npx",
+      "args": ["-y", "stitch-mcp"],
+      "env": {
+        "GOOGLE_CLOUD_PROJECT": "sunlit-runway-403218"
+      }
+    }
+  }
+}

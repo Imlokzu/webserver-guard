@@ -152,12 +152,38 @@ EOF
     logs)
         # Get module logs
         if [ -f "$LOG_FILE" ]; then
-            # Get last 500 lines
-            LOGS=$(tail -n 500 "$LOG_FILE" | sed 's/"/\\"/g' | sed ':a;N;$!ba;s/\n/\\n/g')
-            echo "{\"success\":true,\"logs\":\"$LOGS\"}"
+            # Read logs line by line and build JSON array
+            echo '{"success":true,"logs":"'
+            tail -n 500 "$LOG_FILE" | while IFS= read -r line || [ -n "$line" ]; do
+                # Escape special characters for JSON
+                escaped=$(echo "$line" | sed 's/\\/\\\\/g' | sed 's/"/\\"/g' | sed 's/\t/\\t/g')
+                echo "$escaped\\n"
+            done | tr -d '\n'
+            echo '"}'
         else
-            echo '{"success":false,"logs":"Log file not found"}'
+            echo '{"success":false,"logs":"LOG FILE NOT FOUND"}'
         fi
+        ;;
+        
+    processes)
+        # Get all running processes
+        echo '{"processes":['
+        
+        FIRST=true
+        ps -A -o PID,NAME,RSS | tail -n +2 | sort -k3 -rn | head -n 50 | while read -r pid name rss; do
+            if [ "$FIRST" = true ]; then
+                FIRST=false
+            else
+                echo ","
+            fi
+            
+            # Convert RSS to MB
+            MEM_MB=$((rss / 1024))
+            
+            echo -n "{\"pid\":\"$pid\",\"name\":\"$name\",\"memory\":\"${MEM_MB}MB\"}"
+        done
+        
+        echo ']}'
         ;;
         
     *)
