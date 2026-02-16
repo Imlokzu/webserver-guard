@@ -1,0 +1,27 @@
+# Build artifacts
+*.zip
+temp_check/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.bak
+*.old
+
+# Personal files
+docs.md
+server.ts

@@ -1,0 +1,26 @@
+# WebServer Guard System Properties
+
+# Module identification
+ro.webserver.guard.version=1.0.0
+ro.webserver.guard.author=AndroidRootDev
+
+# Network configuration
+net.hostname=android-webserver
+persist.sys.webserver.enabled=1
+
+# Memory management tweaks
+ro.config.low_ram=false
+ro.sys.fw.bg_apps_limit=60
+
+# Disable aggressive memory management
+ro.config.hw_quickpoweron=false
+persist.sys.purgeable_assets=0
+
+# Battery optimization bypass hints
+pm.dexopt.bg-dexopt=speed
+pm.dexopt.boot=speed
+pm.dexopt.install=speed
+
+# Process management
+sys.keep_app_1=com.termux
+persist.sys.webserver.autostart=1

@@ -1,0 +1,370 @@
+WebServer Guard Module - Complete Directory Structure
+=====================================================
+
+Build Directory (Source):
+-------------------------
+.
+├── META-INF/
+│   └── com/
+│       └── google/
+│           └── android/
+│               └── updater-script          # Magisk installer marker (#MAGISK)
+│
+├── scripts/                                # Helper scripts
+│   ├── webserver_watchdog.sh              # Monitors and restarts web server
+│   ├── protection_daemon.sh               # Monitors and protects processes
+│   ├── logcat_monitor.sh                  # Monitors LMK events
+│   └── protect_manager.sh                 # CLI management tool
+│
+├── webroot/                                # Web server content
+│   └── index.html                         # Default web page
+│
+├── module.prop                             # Module metadata (REQUIRED)
+├── customize.sh                            # Installation script
+├── post-fs-data.sh                        # Early boot script (blocking)
+├── service.sh                             # Late boot script (non-blocking)
+├── uninstall.sh                           # Cleanup script
+├── system.prop                            # System properties
+├── sepolicy.rule                          # SELinux policy rules
+│
+├── README.md                              # Main documentation
+├── INSTALLATION.md                        # Installation guide
+├── TECHNICAL.md                           # Technical documentation
+├── QUICKSTART.md                          # Quick start guide
+├── STRUCTURE.txt                          # This file
+│
+├── build.sh                               # Build script (creates ZIP)
+└── docs.md                                # Original reference docs
+
+
+Installed Module Structure (On Device):
+---------------------------------------
+/data/adb/modules/android.webserver.guard/
+│
+├── module.prop                             # Module metadata
+├── post-fs-data.sh                        # Early boot script
+├── service.sh                             # Late boot script
+├── uninstall.sh                           # Cleanup script
+├── system.prop                            # System properties
+├── sepolicy.rule                          # SELinux rules
+│
+├── protected.list                         # List of protected processes (created at runtime)
+│
+├── scripts/                                # Helper scripts
+│   ├── webserver_watchdog.sh              # Web server monitor
+│   ├── protection_daemon.sh               # Process protection engine
+│   ├── logcat_monitor.sh                  # Logcat monitor
+│   └── protect_manager.sh                 # Management CLI
+│
+├── webroot/                                # Web server document root
+│   └── index.html                         # Default page
+│
+├── system/                                 # System overlay (if needed)
+│   └── bin/                               # System binaries (optional)
+│
+└── README.md                              # Documentation
+
+
+Runtime Files (Created During Operation):
+-----------------------------------------
+/data/local/tmp/
+├── webserver_module.log                   # Main module log
+├── webserver_logs/                        # Additional logs directory
+└── webserver_pids/                        # PID tracking
+    └── httpd.pid                          # Web server PID
+
+
+File Permissions:
+-----------------
+module.prop                 0644 (rw-r--r--)
+customize.sh                0755 (rwxr-xr-x)
+post-fs-data.sh            0755 (rwxr-xr-x)
+service.sh                 0755 (rwxr-xr-x)
+uninstall.sh               0755 (rwxr-xr-x)
+system.prop                0644 (rw-r--r--)
+sepolicy.rule              0644 (rw-r--r--)
+protected.list             0644 (rw-r--r--)
+scripts/*.sh               0755 (rwxr-xr-x)
+webroot/index.html         0644 (rw-r--r--)
+
+
+File Ownership:
+--------------
+All files: root:root (0:0)
+
+
+Boot Execution Order:
+--------------------
+1. Magisk starts
+2. post-fs-data.sh executes (BLOCKING)
+   - Initialize logging
+   - Set system properties
+   - Prepare directories
+   - Free port 80
+3. Module system folder mounted
+4. service.sh executes (NON-BLOCKING)
+   - Wait for boot completion
+   - Configure battery optimizations
+   - Setup iptables
+   - Start web server
+   - Start protection daemon
+   - Start watchdog
+   - Apply system tweaks
+   - Protect Termux
+
+
+Process Tree (After Boot):
+--------------------------
+init (PID 1)
+├── magiskd
+│   └── magisk --daemon
+│
+├── httpd (BusyBox web server)
+│   └── Listening on port 8080
+│
+├── sh (protection_daemon.sh)
+│   └── Monitors protected processes every 30s
+│
+└── sh (webserver_watchdog.sh)
+    └── Monitors web server every 15s
+
+
+Network Configuration:
+---------------------
+Port 80 (external) → iptables NAT → Port 8080 (httpd)
+
+iptables rules:
+- PREROUTING: -p tcp --dport 80 -j REDIRECT --to-ports 8080
+- OUTPUT: -p tcp --dport 80 -j REDIRECT --to-ports 8080
+
+
+Protected Processes:
+-------------------
+Default:
+- com.termux (Termux app)
+- httpd (web server)
+
+User-defined:
+- Listed in protected.list
+- Managed via protect_manager.sh
+
+
+System Properties Set:
+----------------------
+ro.webserver.guard.active=1
+ro.webserver.guard.running=1
+persist.webserver.guard.enabled=1
+ro.webserver.guard.version=1.0.0
+
+
+SELinux Contexts:
+-----------------
+Module files: module_file
+Scripts: shell
+Web server: shell (runs as root)
+
+
+Memory Management:
+-----------------
+LMK parameters: 1024,2048,4096,8192,12288,16384 (pages)
+ZRAM: 512MB (if available)
+Swappiness: 100
+OOM scores: -1000 (protected processes)
+
+
+Log Files:
+----------
+Main log: /data/local/tmp/webserver_module.log
+Format: $(date): [COMPONENT] Message
+
+Components:
+- POST-FS-DATA
+- SERVICE
+- WATCHDOG
+- DAEMON
+- LOGCAT
+
+
+Build Process:
+--------------
+1. Validate all required files exist
+2. Check line endings (must be LF, not CRLF)
+3. Set correct permissions
+4. Create ZIP archive
+5. Verify ZIP structure
+
+Command: ./build.sh
+Output: WebServerGuard_v1.0.0.zip
+
+
+Installation Process:
+--------------------
+1. User selects ZIP in Magisk Manager
+2. Magisk extracts ZIP to temp directory
+3. Magisk runs customize.sh
+4. customize.sh:
+   - Validates architecture
+   - Creates directories
+   - Sets permissions
+   - Creates default files
+5. Magisk moves module to /data/adb/modules/
+6. User reboots
+7. post-fs-data.sh runs
+8. service.sh runs
+9. Module is active
+
+
+Uninstallation Process:
+-----------------------
+1. User removes module in Magisk Manager
+2. Magisk runs uninstall.sh
+3. uninstall.sh:
+   - Stops all services
+   - Removes iptables rules
+   - Cleans up temp files
+   - Resets system properties
+4. Magisk removes module directory
+5. User reboots
+6. Module is removed
+
+
+Dependencies:
+-------------
+Required:
+- Magisk v20.4+
+- Android 5.0+ (API 21+)
+- Root access
+- BusyBox (provided by Magisk)
+
+Optional:
+- iptables (for port 80 redirect)
+- ZRAM support (for memory optimization)
+
+
+Supported Architectures:
+------------------------
+- arm (32-bit ARM)
+- arm64 (64-bit ARM)
+- x86 (32-bit Intel)
+- x64 (64-bit Intel)
+- riscv64 (64-bit RISC-V)
+
+
+Module Size:
+-----------
+Source: ~50 KB
+Installed: ~100 KB
+Runtime memory: ~10 MB + 512 MB ZRAM
+
+
+Key Features Summary:
+--------------------
+✓ Persistent web server on port 80
+✓ Process protection engine
+✓ Automatic Termux protection
+✓ OOM score adjustment
+✓ Battery optimization bypass
+✓ Watchdog auto-restart
+✓ LMK tuning
+✓ ZRAM activation
+✓ SELinux compatible
+✓ Multi-architecture support
+✓ Comprehensive logging
+✓ CLI management tool
+
+
+Configuration Files:
+-------------------
+protected.list          - List of protected processes (one per line)
+webroot/index.html      - Web server content
+system.prop             - System properties
+sepolicy.rule           - SELinux rules
+
+
+Management Commands:
+-------------------
+# Interactive manager
+su -c /data/adb/modules/android.webserver.guard/scripts/protect_manager.sh
+
+# View status
+su -c /data/adb/modules/android.webserver.guard/scripts/protect_manager.sh status
+
+# Add protection
+su -c /data/adb/modules/android.webserver.guard/scripts/protect_manager.sh add <process>
+
+# Remove protection
+su -c /data/adb/modules/android.webserver.guard/scripts/protect_manager.sh remove <process>
+
+# View logs
+su -c cat /data/local/tmp/webserver_module.log
+
+# Test web server
+curl http://localhost
+
+
+Documentation Files:
+-------------------
+README.md           - Main documentation (features, usage, troubleshooting)
+INSTALLATION.md     - Installation guide (methods, verification, debugging)
+TECHNICAL.md        - Technical documentation (architecture, internals)
+QUICKSTART.md       - Quick start guide (5-minute setup)
+STRUCTURE.txt       - This file (directory structure reference)
+
+
+Version Information:
+-------------------
+Module Version: 1.0.0
+Version Code: 1000
+Module ID: android.webserver.guard
+Author: AndroidRootDev
+Last Updated: 2024
+
+
+Support Resources:
+-----------------
+Logs: /data/local/tmp/webserver_module.log
+Magisk Documentation: https://topjohnwu.github.io/Magisk/guides.html
+XDA Forums: https://xdaforums.com/
+GitHub Issues: (your repository)
+
+
+Known Limitations:
+-----------------
+1. Android LMK can still kill in extreme low memory
+2. Port 80 may require iptables redirect
+3. Battery drain from continuous monitoring
+4. SELinux may require permissive mode on some devices
+5. Some OEMs have additional process restrictions
+
+
+Future Enhancements:
+-------------------
+- Web-based management UI
+- HTTPS support
+- Authentication system
+- Process restart automation
+- Advanced memory management
+- Custom OOM score levels
+- Per-process configuration
+- Notification system
+- Statistics dashboard
+
+
+Testing Checklist:
+-----------------
+□ Module installs without errors
+□ Web server starts on boot
+□ Port 80 accessible
+□ Termux protected (OOM: -1000)
+□ Watchdog restarts killed httpd
+□ Protection daemon monitors processes
+□ Logs created and updated
+□ iptables rules applied
+□ ZRAM activated
+□ Battery optimization bypassed
+□ SELinux rules applied
+□ Uninstall cleans up properly
+
+
+End of Structure Documentation
+==============================

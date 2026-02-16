@@ -1,0 +1,65 @@
+# WebServer Guard SELinux Policy Rules
+
+# Allow shell to execute module files
+allow shell module_file { file dir } *
+
+# Allow system_server to execute module scripts
+allow system_server module_file { read execute open getattr }
+
+# Allow init to execute module scripts
+allow init module_file { read execute open getattr }
+
+# Allow untrusted_app (Termux) to access module files
+allow untrusted_app module_file { read open getattr }
+
+# Allow shell to write to proc oom_score_adj
+allow shell proc { file } { write open }
+allow shell proc_type { file } { write open }
+
+# Allow shell to modify oom_score_adj for any process
+allow shell domain { process } { setsched }
+
+# Allow httpd (web server) to bind to privileged ports
+allow shell port { tcp_socket } { name_bind }
+allow shell node { tcp_socket } { node_bind }
+
+# Allow shell to use iptables
+allow shell iptables_exec { file } { execute execute_no_trans }
+
+# Allow shell to read/write network state
+allow shell proc_net { file } { read open getattr }
+
+# Allow shell to access logcat
+allow shell logd { unix_stream_socket } { connectto }
+
+# Allow module scripts to create files in /data/local/tmp
+allow shell shell_data_file { dir file } { create write read open getattr setattr }
+
+# Allow shell to kill processes
+allow shell domain { process } { signal sigkill }
+
+# Allow shell to read process information
+allow shell domain { dir file } { read open getattr }
+
+# Allow shell to modify system properties
+allow shell property_type { property_service } { set }
+
+# Allow shell to access device idle controller
+allow shell system_server { binder } { call transfer }
+
+# Allow httpd to read web content
+allow shell module_file { dir } { search read open getattr }
+
+# Allow shell to create sockets
+allow shell self { tcp_socket udp_socket } { create bind listen accept read write }
+
+# Allow shell to access network
+allow shell node { tcp_socket udp_socket } { node_bind }
+allow shell port { tcp_socket } { name_bind }
+
+# Allow shell to use BusyBox
+allow shell system_file { file } { execute execute_no_trans }
+
+# Permissive mode for module domain (use with caution)
+# Uncomment if you encounter persistent SELinux denials
+# permissive shell

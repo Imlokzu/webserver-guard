@@ -1,0 +1,7 @@
+id=android.webserver.guard
+name=WebServer Guard & Process Protector
+version=1.0.0
+versionCode=1000
+author=AndroidRootDev
+description=Persistent web server on port 80 with advanced process protection. Prevents Android from killing Termux and user-selected processes. Includes watchdog, OOM protection, and battery optimization bypass.
+updateJson=https://raw.githubusercontent.com/example/webserver-guard/master/update.json
