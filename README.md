@@ -9,6 +9,14 @@ Transform your rooted Android device into a **persistent web server host** with 
 
 ## ✨ Features
 
+### 🌐 Web Management Interface (NEW!)
+- Modern web-based control panel
+- Real-time status monitoring
+- Add/remove protected processes via UI
+- Live log viewer with download
+- Works with Magisk v28.1+ WebUI or any browser
+- Auto-refresh dashboard
+
 ### 🌐 Web Server
 - Persistent web server on port 80 (with automatic 8080 fallback)
 - Auto-restart watchdog monitors and restarts killed processes
@@ -36,6 +44,11 @@ Transform your rooted Android device into a **persistent web server host** with 
 
 ## 📦 Installation
 
+### Requirements
+- Android 5.0+ (API 21+)
+- Magisk 20.4+ (v28.1+ recommended for WebUI support)
+- Root access
+
 ### Method 1: Via Magisk Manager (Recommended)
 
 1. Download `WebServerGuard_v1.0.0.zip` from [Releases](https://github.com/imlokzu/webserver-guard/releases)
@@ -43,6 +56,29 @@ Transform your rooted Android device into a **persistent web server host** with 
 3. Go to **Modules** → **Install from storage**
 4. Select the ZIP file
 5. Reboot device
+
+### WebUI Access (Magisk v28.1+)
+
+If you're using Magisk v28.1 or higher, you can access the web management interface:
+
+1. Open Magisk Manager
+2. Go to **Modules**
+3. Find **WebServer Guard** module
+4. Tap on the module card
+5. Click **Open WebUI** button
+6. Manage your protected processes through the web interface
+
+Alternatively, access directly via browser:
+- `http://localhost/manage.html`
+- `http://YOUR_DEVICE_IP/manage.html`
+
+### For Older Magisk Versions or Custom Forks
+
+If using Magisk Delta, Kitsune, FoxMMM, or versions below v28.1:
+
+1. Install [KSU WebUI APK](https://github.com/tiann/KernelSU/releases)
+2. Grant root permissions
+3. Access module WebUI through KSU WebUI app
 
 ### Method 2: Via ADB
 
@@ -64,7 +100,25 @@ reboot
 
 After installation and reboot:
 
-### Access Web Server
+### Option 1: Web Management Interface (Recommended)
+
+**For Magisk v28.1+:**
+1. Open Magisk Manager → Modules
+2. Tap on **WebServer Guard**
+3. Click **Open WebUI**
+4. Manage everything through the web interface
+
+**For all versions:**
+- Access via browser: `http://localhost/manage.html`
+- Features:
+  - 📊 Real-time status dashboard
+  - 🛡️ Add/remove protected processes
+  - 📝 Live log viewer
+  - 🔄 Auto-refresh every 30 seconds
+
+### Option 2: Command Line Interface
+
+#### Access Web Server
 
 ```bash
 # From device
@@ -74,7 +128,7 @@ curl http://localhost
 curl http://YOUR_DEVICE_IP
 ```
 
-### Manage Protected Processes
+#### Manage Protected Processes
 
 ```bash
 # Interactive CLI
@@ -87,7 +141,7 @@ su -c /data/adb/modules/android.webserver.guard/scripts/protect_manager.sh statu
 su -c /data/adb/modules/android.webserver.guard/scripts/protect_manager.sh add com.example.app
 ```
 
-### Check Logs
+#### Check Logs
 
 ```bash
 su -c cat /data/local/tmp/webserver_module.log

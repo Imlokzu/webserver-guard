@@ -1,0 +1,21 @@
+{
+  "name": "WebServer Guard",
+  "version": "1.0.0",
+  "versionCode": 1000,
+  "author": "AndroidRootDev",
+  "description": "Persistent web server with process protection management",
+  "webRoot": "webroot",
+  "main": "index.html",
+  "icon": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='75' font-size='75'%3E🛡️%3C/text%3E%3C/svg%3E",
+  "permissions": [
+    "root",
+    "network"
+  ],
+  "features": [
+    "Process Protection Management",
+    "Real-time Status Monitoring",
+    "Log Viewer",
+    "Protected Process List",
+    "Add/Remove Protection"
+  ]
+}
